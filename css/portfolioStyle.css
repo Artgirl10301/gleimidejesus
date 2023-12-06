@@ -125,6 +125,21 @@ footer {
     line-height: 1.4;
 }
 
+/* Styles for larger screens */
+@media (min-width: 768px) {
+    /* Add your styles here */
+}
+
+/* Styles for smaller screens */
+@media (max-width: 767px) {
+    /* Add your styles here */
+}
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+
 
 
 
