@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CSS Custom Cursor</title>
+<style>       
+    
+    img {
+        cursor: url("wateringCan.png"), auto;
+    }
+
+    .grid-container {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: auto auto auto;
+        background-color: #964B00;
+        padding: 10px;
+        margin: 20px 120px;
+    }
+
+    .grid-item {
+        background-color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.8);
+        padding: 10px;
+        text-align: center;
+    }
+    
+</style>
+</head>
+<body>
+	<p>Welcome to my Garden</p>
+
+    <br>
+    <br>
+
+    <p id="demo">Water your plants</p>
+
+    <div class="grid-container">
+        <div class="grid-item" onclick="myFunction()"><img src="comp2.jpg" alt="plant1 png" width="200" height="200"></div>
+        <div class="grid-item"><img src="comp2.jpg" alt="plant2 png" width="200" height="200"></div>
+        <div class="grid-item"><img src="comp2.jpg" alt="plant3 png" width="200" height="200"></div>  
+        <div class="grid-item"><img src="plant1.jpg" alt="plant4 png" width="200" height="200"></div>
+        <div class="grid-item"><img src="plant2.jpg" alt="plant5 png" width="200" height="200"></div>
+        <div class="grid-item"><img src="plant3.jpg" alt="plant6 png" width="200" height="200"></div>  
+        <div class="grid-item"><img src="plant1.jpg" alt="plant7 png" width="200" height="200"></div>
+        <div class="grid-item"><img src="plant2.jpg" alt="plant8 png" width="200" height="200"></div>
+        <div class="grid-item"><img src="plant3.jpg" alt="plant9 png" width="200" height="200"></div>  
+      </div>
+
+    <script>
+        function myFunction() {
+          document.getElementById("demo").innerHTML = "You watered the plant!";
+          //document.getElementsByClassName("grid-item").innerHTML = "You watered the plant!";
+        }
+    </script>
+</body>
+</html>
