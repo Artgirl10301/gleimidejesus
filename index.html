@@ -1,284 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gleimi De Jesus - Art Portfolio</title>
-    <link href="css/portfolioStyle.css" type="text/css" rel="stylesheet">
-       
-    
-</head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gleimi De Jesus — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0e0e0e; --white: #f5f3ef; --mid: #b0aa9f;
+      --accent: #c8391a; --dim: rgba(14,14,14,0.55);
+      --ticker-h: 40px; --nav-h: 44px;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--white); color: var(--black); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 17px; line-height: 1.65; overflow-x: hidden; }
 
+    /* TICKER */
+    .ticker-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--black); height: var(--ticker-h); overflow: hidden; display: flex; align-items: center; }
+    .ticker-wrap.bottom { top: auto; bottom: 0; }
+    .ticker-track { display: flex; white-space: nowrap; animation: ticker 55s linear infinite; }
+    .ticker-wrap.bottom .ticker-track { animation: ticker-rev 55s linear infinite; }
+    .ticker-track span { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--white); padding: 0 2.5rem; }
+    .ticker-track span.dot { color: var(--accent); padding: 0; font-size: 14px; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @keyframes ticker-rev { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+
+    /* NAV */
+    .nav { position: fixed; top: var(--ticker-h); left: 0; right: 0; z-index: 99; height: var(--nav-h); display: flex; align-items: center; padding: 0 1.5rem; background: var(--white); border-bottom: 1px solid transparent; transition: border-color 0.3s; }
+    .nav.scrolled { border-bottom-color: #ddd; }
+    .nav-toggle { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; background: none; border: 1px solid var(--black); color: var(--black); padding: 5px 12px; cursor: pointer; transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+    .nav-toggle:hover { background: var(--black); color: var(--white); }
+    .nav-links { display: flex; overflow: hidden; max-width: 0; transition: max-width 0.45s cubic-bezier(0.77,0,0.175,1); }
+    .nav-links.open { max-width: 400px; }
+    .nav-links a { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--black); text-decoration: none; padding: 5px 18px; white-space: nowrap; border-left: 1px solid #ccc; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--accent); }
+
+    .page-body { padding-top: calc(var(--ticker-h) + var(--nav-h)); padding-bottom: var(--ticker-h); }
+
+    /* HERO */
+    .hero { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - var(--ticker-h) - var(--nav-h)); border-bottom: 1px solid #d6d1c8; }
+    .hero-left { padding: 2rem 2.5rem 2rem 3rem; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2.8rem, 5vw, 5rem); font-weight: 400; line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 1rem; flex-shrink: 0; }
+    .hero-text-block { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 0.6em; margin-bottom: 1rem; }
+    .hero-body { font-size: 18px; line-height: 1.7; color: #3a3530; max-width: 60ch; flex-shrink: 1; }
+    .piece-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; flex-shrink: 0; border-top: 1px solid #e0dbd3; padding-top: 1rem; }
+    .piece-list li { cursor: pointer; }
+    .piece-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid); margin-bottom: 1px; }
+    .piece-title { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-style: italic; color: var(--black); transition: color 0.2s; }
+    .piece-list li:hover .piece-title, .piece-list li.active .piece-title { color: var(--accent); }
+
+    /* GALLERY */
+    .hero-right { border-left: 1px solid #d6d1c8; overflow-y: auto; scrollbar-width: none; padding: 2rem 1.5rem; }
+    .hero-right::-webkit-scrollbar { display: none; }
+    .masonry { columns: 2; column-gap: 6px; }
+    .m-item { break-inside: avoid; margin-bottom: 6px; position: relative; cursor: pointer; overflow: hidden; background: #c8c2b8; }
+    .m-item img { display: block; width: 100%; height: auto; transition: transform 0.5s ease, filter 0.4s ease; filter: grayscale(10%); }
+    .m-item:hover img { transform: scale(1.03); filter: grayscale(0%); }
+    .m-item::after { content: ''; position: absolute; inset: 0; background: var(--dim); opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
+    .m-placeholder { display: block; width: 100%; background: #c8c2b8; }
+    .m-label { position: absolute; bottom: 0.7rem; left: 0.8rem; font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,243,239,0.9); z-index: 2; opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+    .m-item:hover .m-label { opacity: 1; transform: translateY(0); }
+    .masonry.has-active .m-item:not(.active)::after { opacity: 1; }
+    .masonry.has-active .m-item:not(.active) img { filter: grayscale(60%); }
+    .m-item.active::after { opacity: 0 !important; }
+    .m-item.active img { filter: grayscale(0%) !important; }
+
+    /* LIGHTBOX */
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(10,10,10,0.95); align-items: center; justify-content: center; flex-direction: column; }
+    .lightbox.open { display: flex; }
+    .lb-img-wrap { max-width: 90vw; max-height: 80vh; display: flex; align-items: center; justify-content: center; }
+    .lb-img-wrap img { max-width: 90vw; max-height: 80vh; object-fit: contain; display: block; }
+    .lb-close { position: fixed; top: calc(var(--ticker-h) + 1rem); right: 1.5rem; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--white); background: none; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; cursor: pointer; transition: border-color 0.2s; }
+    .lb-close:hover { border-color: var(--white); }
+    .lb-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: none; border: 1px solid rgba(255,255,255,0.25); color: var(--white); font-size: 1.2rem; padding: 0.8rem 1rem; cursor: pointer; transition: border-color 0.2s; z-index: 201; }
+    .lb-arrow:hover { border-color: var(--white); }
+    .lb-prev { left: 1.5rem; } .lb-next { right: 1.5rem; }
+    .lb-arrow:disabled { opacity: 0.2; cursor: default; }
+    .lb-meta { margin-top: 1.2rem; text-align: center; }
+    .lb-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-style: italic; color: var(--white); }
+    .lb-counter { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: var(--mid); margin-top: 0.4rem; }
+
+    /* CV */
+    .cv-section { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - var(--ticker-h) - var(--nav-h)); border-bottom: 1px solid #d6d1c8; }
+    .cv-bio { padding: 4rem 3rem 4rem 4rem; border-right: 1px solid #d6d1c8; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--mid) transparent; }
+    .cv-bio::-webkit-scrollbar { width: 4px; } .cv-bio::-webkit-scrollbar-thumb { background: var(--mid); border-radius: 2px; }
+    .cv-bio-name { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; margin-bottom: 2.5rem; line-height: 1.1; }
+    .cv-bio-text { font-size: 18px; line-height: 1.82; color: #3a3530; }
+    .cv-bio-text p + p { margin-top: 1.2em; }
+    .cv-details { padding: 4rem 4rem 2rem 3rem; overflow-y: auto; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: var(--mid) transparent; }
+    .cv-details::-webkit-scrollbar { width: 4px; } .cv-details::-webkit-scrollbar-thumb { background: var(--mid); border-radius: 2px; }
+    .cv-entries { flex: 1; }
+    .cv-block { margin-bottom: 2.5rem; }
+    .cv-block-title { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.7rem; padding-bottom: 0.4rem; border-bottom: 1px solid #ddd; }
+    .cv-name-large { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 400; margin-bottom: 0.15rem; }
+    .cv-sub { font-size: 13px; color: #666; line-height: 1.5; }
+    .cv-sub a { color: var(--accent); text-decoration: none; } .cv-sub a:hover { text-decoration: underline; }
+    .cv-entry { margin-bottom: 0.9rem; }
+    .cv-entry-title { font-size: 18px; font-weight: 400; line-height: 1.4; }
+    .cv-entry-sub { font-size: 16px; color: var(--mid); font-style: italic; }
+    .cv-actions { display: flex; gap: 1rem; padding-top: 2.5rem; padding-bottom: 2rem; flex-wrap: wrap; }
+    .cv-btn { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 20px; border: 1px solid var(--black); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; color: var(--black); transition: background 0.2s, color 0.2s; }
+    .cv-btn:hover { background: var(--black); color: var(--white); }
+    .cv-btn.primary { background: var(--black); color: var(--white); }
+    .cv-btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+
+    footer { text-align: center; padding: 3.5rem 2rem calc(3.5rem + var(--ticker-h)); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid); }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; height: auto; }
+      .hero-left { order: 1; padding: 2rem 1.5rem 1.5rem; height: auto; overflow: visible; justify-content: flex-start; gap: 1rem; }
+      .hero-title { font-size: clamp(2.8rem, 11vw, 3.8rem); margin-bottom: 0.8rem; }
+      .hero-text-block { overflow: visible; height: auto; flex: none; }
+      .hero-body { max-width: 100%; }
+      .piece-list { margin-top: 1.2rem; }
+      .hero-right { order: 2; border-left: none; border-top: 1px solid #d6d1c8; height: 80vw; overflow-y: auto; padding: 1rem; }
+      .cv-section { grid-template-columns: 1fr; height: auto; }
+      .cv-bio { padding: 2.5rem 1.5rem 2rem; border-right: none; border-bottom: 1px solid #d6d1c8; height: auto; overflow: visible; }
+      .cv-bio-name { font-size: clamp(2.2rem, 9vw, 3rem); margin-bottom: 1.5rem; }
+      .cv-details { height: auto; overflow: visible; padding: 2.5rem 1.5rem 1.5rem; }
+      .cv-actions { flex-direction: column; gap: 0.75rem; padding-top: 2rem; padding-bottom: 2.5rem; }
+      .cv-btn { justify-content: center; }
+      .nav-links.open { max-width: 280px; }
+      .lb-arrow { padding: 0.6rem 0.75rem; font-size: 1rem; }
+      .lb-prev { left: 0.5rem; } .lb-next { right: 0.5rem; }
+    }
+    @media (max-width: 480px) {
+      .hero-left { padding: 1.8rem 1.2rem 1.2rem; }
+      .cv-bio { padding: 2rem 1.2rem; }
+      .cv-details { padding: 2rem 1.2rem; }
+      .masonry { columns: 1; }
+    }
+    ::selection { background: var(--accent); color: var(--white); }
+  </style>
+</head>
 <body>
 
-    <header>
-        <h1>Gleimi De Jesus</h1>
-        <p>Artist | Creative | Innovator</p>
-    </header>
+<div class="ticker-wrap" aria-hidden="true"><div class="ticker-track" id="tickerTop"></div></div>
 
-    <nav>
-        <a href="#portfolio">Portfolio</a>
-        <a href="#about">About Me</a>
-        <a href="#cv">CV</a>
-    </nav>
+<nav class="nav" id="mainNav">
+  <button class="nav-toggle" id="navToggle" aria-expanded="false">Menu</button>
+  <div class="nav-links" id="navLinks">
+    <a href="#hero">Home</a><a href="#about">About</a><a href="#cv">CV</a><a href="#projects">Projects</a>
+  </div>
+</nav>
 
-    <section id="portfolio">
-        <h2>Sculpture and Fabrication</h2>
-        <h3>Artist Statement</h3>
-        <p>Balance is rooted in our relationships with people and our environment. 
-            My work acts as a tool to generate change in artificial settings and situations that I create, by focusing on the impact of people within them. 
-            Balance emerges through a constant, dynamic exchange of interactions. 
-            I explore the idea of balance in my immersive kinetic sculptures through symmetrical compositions that, as movement is captured by integrated motion sensors, shift and change as someone approaches. 
-            This movement results in a mark in the sand or a change in orientation. 
-            My wearable sculptures link people together to highlight their impact on one another. 
-            These wearables cannot be worn individually, or else they won't function, communicating how people rely on each other to maintain balance and how change is the process of maintaining this equilibrium.</p>
-        <!-- <div class="gallery">   -->
-        <!-- Replace the following with your image URLs -->
-        <!-- <img src="togther.jpg" alt="Artwork 1">
-            <img src="togther 1.jpg" alt="Artwork 2">
-            <img src="Listen.jpg"  alt="Artwork 3">   
-            <img src="presslisten_2.jpg" alt="Artwork 4">
-            <img src="Presslisten.jpg" alt="Artwork 5">
-            <img src="tiem stamp.jpg" alt="Artwork 6">
-            <img src="1 leaf in the wind.jpg" alt="Artwork 7">
-            <img src="IMG_0742 copy.jpg" alt="Artwork 8">
-            <img src="IMG_0743 copy.jpg" alt="Artwork 9">
-            <img src="complicated.jpg" alt="Artwork 10">
-            <img src="wood 1.jpg" alt="Artwork 11">
-            <img src="WOOD2 jpg.jpg" alt="Artwork 12">
-            <img src="WOOD3 jpg.jpg" alt="Artwork 13">
-            <img src="IMG_0715 copy.jpg" alt="Artwork 14">
-            <img src="fuo.jpg" alt="Artwork 15">
-            <img src="3.27 final.jpg" alt="Artwork 16">
-            <img src="AJ1.1.jpg" alt="Artwork 17">
-            <img src="AJ1.2.jpg" alt="Artwork 18">            -->
-        <!-- Add more images as needed  -->
-        <!-- </div> -->
-        <div class="gallery">
-            <figure>
-                <img src="togther.jpg" alt="Artwork 1">
-                <figcaption>
-                    
-                    <h2>Gleimi De Jesus</h2>
-                    <br>
-                    <h3>Together (2023)</h3>
-                    <p><strong>Year:</strong> 2023</p>
-                    <p><strong>Material:</strong> Maple (Wood), Twine</p>
-                    <p><strong>Dimensions:</strong> 7’ x 4’ x 1”</p>
-                    <p>
-                     ,Together reflects a larger relationship between people and on how outside 
-                     influences impact a direct relationship.                
-                    </p>
-                </figcaption>
-               
-               
-            </figure>
-            <figure>
-                <img src="togther 1.jpg" alt="Artwork 2">
-                <figcaption>Together (2023) </figcaption>
-            </figure>
-            <figure>
-                <img src="Listen.jpg" alt="Artwork 3">
-                <figcaption>Listen(2023) </figcaption>
-            </figure>
-            <figure>
-                <img src="presslisten_2.jpg" alt="Artwork 4">
-                <figcaption>Listen(2023)  </figcaption>
-            </figure>
-            <figure>
-                <img src="Presslisten.jpg" alt="Artwork 5">
-                <figcaption>Listen(2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="tiem stamp.jpg" alt="Artwork 6">
-                <figcaption>Time Stamp (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="1 leaf in the wind.jpg" alt="Artwork 7">
-                <figcaption>Leaf in The Wind (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="IMG_0742 copy.jpg" alt="Artwork 8">
-                <figcaption>Presence (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="IMG_0743 copy.jpg" alt="Artwork 9">
-                <figcaption>Presence (2023) </figcaption>
-            </figure>
-            <figure>
-                <img src="complicated.jpg" alt="Artwork 10">
-                <figcaption>It's complicated (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="wood 1.jpg" alt="Artwork 11">
-                <figcaption>It's Complicated (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="WOOD2 jpg.jpg" alt="Artwork 12">
-                <figcaption>It's Complicated (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="WOOD3 jpg.jpg" alt="Artwork 13">
-                <figcaption>CIt's Complicated (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="IMG_0715 copy.jpg" alt="Artwork 14">
-                <figcaption>Make The Connection (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="fuo.jpg" alt="Artwork 15">
-                <figcaption>Make The Connection (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="3.27 final.jpg" alt="Artwork 16">
-                <figcaption>By The Neck (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="AJ1.1.jpg" alt="Artwork 17">
-                <figcaption>By The Neck (2023)</figcaption>
-            </figure>
-            <figure>
-                <img src="AJ1.2.jpg" alt="Artwork 18">
-                <figcaption>By The Neck (2023)</figcaption>
-            </figure>
-            <!-- Add more figures as needed -->
+<div class="page-body">
+  <section class="hero" id="hero">
+    <div class="hero-left">
+      <h1 class="hero-title">Balance</h1>
+      <div class="hero-text-block">
+        <p class="hero-body">In my work, I treat the body as a site of negotiation. Drawing from my background in UI/UX design, I explore the 'base flow' of human intimacy. Specifically,the point where connection becomes a constraint.</p>
+        <p class="hero-body">We naturally view life through a self-centered lens, but these wearables force an immediate shift in priority. To wear these pieces is to lose autonomy; a necklace cannot be worn alone, and a ring becomes a fetter. I am fascinated by the 'knots' we become to one another; often tied together by the fragile notes of politeness and social expectation.</p>
+        <p class="hero-body">I document both the forced choreography that is set by the pieces themselves and the natural adjustments the wearer goes through . When one person moves, the other must react in tandem, whether in sync or in resistance. What do we truly compromise to maintain these ties? At what point does the tension of 'us' finally snap the individual?</p>
+      </div>
+      <ul class="piece-list" id="pieceList">
+        <li data-piece="0"><div class="piece-label">Listen</div><div class="piece-title">Filament,Epoxy Resin,Lacquer,Twine</div></li>
+        <li data-piece="1"><div class="piece-label">Together</div><div class="piece-title">maple(Wood),Twine</div></li>
+        <li data-piece="2"><div class="piece-label">It's Complicated</div><div class="piece-title">Pine,Poplar,Oak,Brass</div></li>
+        <li data-piece="3"><div class="piece-label">Making the Connection</div><div class="piece-title">Maple(Wood),Twine,Ardunio uno</div></li>
+        <li data-piece="4"><div class="piece-label">By the Neck</div><div class="piece-title">Resin, Cloth, Ultimate Paper Maché</div></li>
+      </ul>
+    </div>
+
+    <div class="hero-right" id="projects">
+      <div class="masonry" id="masonry"></div>
+    </div>
+  </section>
+
+  <section class="cv-section" id="about">
+    <div class="cv-bio">
+      <h2 class="cv-bio-name">Gleimi De Jesus</h2>
+      <div class="cv-bio-text">
+        <p><strong>Gleimi De Jesus (b. 2001, Dominican Republic)</strong> is an interdisciplinary artist based in Tampa, Florida. Raised within a multicultural and bilingual household, De Jesus developed an early obsession with how individuals adapt, negotiate, and compromise within social structures. This psychological curiosity drives an artistic practice that spans painting, video, and kinetic sculpture.</p>
+        <p>De Jesus creates wearable art and social interfaces that challenge human autonomy. By merging principles of UX/UI design with physical materials, the work investigates the friction of human intimacy, specifically looking at the point where connection transforms into constraint. Through interactive jewelry and performance-based objects, De Jesus forces wearers into a shared and often tense choreography to question the underlying motives and hidden dependencies that dictate our relationships.</p>
+      </div>
+    </div>
+    <div class="cv-details" id="cv">
+      <div class="cv-entries">
+        <div class="cv-block">
+          <div class="cv-block-title">Curriculum Vitae</div>
+          <div class="cv-name-large">Gleimi De Jesus</div>
+          <div class="cv-sub">Tampa, FL<br><a href="mailto:gleimidejesus@gmail.com">gleimidejesus@gmail.com</a></div>
         </div>
-        <div id="lightbox" class="lightbox">
-            <span class="close-btn" onclick="closeLightbox()">&times;</span>
-            <div id="lightbox-content" class="lightbox-content">
-                <img id="lightbox-img">
-                <div id="lightbox-caption-container" class="lightbox-caption"></div>
-            </div>
+        <div class="cv-block">
+          <div class="cv-block-title">Education</div>
+          <div class="cv-entry"><div class="cv-entry-title">New College of Florida, Bachelor of Arts in Humanities, 2024</div><div class="cv-entry-sub">Art Major and Statistics Minor</div></div>
         </div>
-        
+        <div class="cv-block">
+          <div class="cv-block-title">Exhibitions</div>
+          <div class="cv-entry"><div class="cv-entry-title">Issermann Gallery, un/seen bodies, 2023</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Issermann Gallery, New Visions, 2023</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Art Center of Sarasota, Focus: New College Art, 2022</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Tampa Museum of Art, Congressional, 2020</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Tampa Museum of Art Youth Council, Past, Present and Future, 2019</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">University of Tampa Gallery, Scholastics Art and Writing Awards, Gold Key, 2019</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Gallery 221, HCC Dale Mabry Campus, 2018</div></div>
         </div>
-        <h2>Videos</h2>
-        <div class="videos">
-            <!-- Replace the following with your video embed codes or links -->
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/Q1Pel16KTEg?si=k1wVH1_XJJjAnVmh"
-                title="YouTube video player" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen></iframe>
-            <!-- Add more videos as needed -->
+        <div class="cv-block">
+          <div class="cv-block-title">Publications</div>
+          <div class="cv-entry"><div class="cv-entry-title">un/seen bodies catalog, 2023</div></div>
         </div>
-    </section>
+        <div class="cv-block">
+          <div class="cv-block-title">Awards &amp; Honors</div>
+          <div class="cv-entry"><div class="cv-entry-title">Tampa Museum of Art, Congressional, Best Sculpture Award, 2020</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Designed the Congressional Medal of Honor Challenge Coin for Integrity, 2020</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">University of Tampa Gallery, Scholastics Art and Writing Awards, Gold Key, 2019</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Tampa Bay Fair Housing Consortium, Annual Fair Housing Symposium's Poster Contest, First Place, 2019</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">EPC, Environmental Photography Contest, Second Place, 2019</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Gallery 221 @ HCC Dale Mabry Campus, Calyx Schencker Art Infinitum, 3rd Place Photography, CSAI 2018</div></div>
+        </div>
+        <div class="cv-block">
+          <div class="cv-block-title">Professional Experience</div>
+          <div class="cv-entry"><div class="cv-entry-title">New College of Florida — Teaching Assistant &amp; Sculpture Lab Technician</div><div class="cv-entry-sub">Sarasota, FL · August 2021 – 2024</div></div>
+          <div class="cv-entry"><div class="cv-entry-title">Multicultural Health Institute — Communications &amp; Graphics / Data Visualization</div><div class="cv-entry-sub">Sarasota, FL · March 2022 – August 2022</div></div>
+        </div>
+      </div>
+      <div class="cv-actions">
+        <a href="Curriculum Vitae — Gleimi De Jesus.pdf" download class="cv-btn primary">&#8595; Download CV</a>
+        <a href="mailto:gleimidejesus@gmail.com" class="cv-btn">&#9993; Contact</a>
+      </div>
+    </div>
+  </section>
 
-    <section id="about">
-        <h2>About Me</h2>
-        <img src="IMG_1771.JPG" alt="Gleimi De Jesus" style="width: 250px; height: auto;">
-        <p>
-            Born in the vibrant culture of the Dominican Republic on October 3, 2001, and raised amidst the urban tapestry of Tampa, Florida, I am Gleimi De Jesus—an artist driven by the profound dynamics of human connections. Growing up as the youngest in a family shaped by both Dominican and American influences, I developed a keen interest in the ways cultures intertwine and individuals adapt.
-        </p>
+  <footer>&copy; <span id="year"></span> Gleimi De Jesus &nbsp;&middot;&nbsp; Tampa, FL</footer>
+</div>
 
-        <p>
-            Tampa's urban nature became my canvas, providing insights into how people interact within the intricate web of urban life. What captivates me most is not just what people do, but why they do it. This fascination steered my educational journey into the arts, leading me to explore both painting and sculpture.
-        </p>
+<div class="ticker-wrap bottom" aria-hidden="true"><div class="ticker-track" id="tickerBottom"></div></div>
 
-        <p>
-            While painting captures moments with timeless strokes, sculpture, to me, is a dynamic conversation in three dimensions. It invites viewers to engage physically and emotionally, offering a unique perspective on the interplay of form and space. My work delves into the essence of balance, exploring how individuals impact each other and their surroundings. Through immersive kinetic sculptures and wearable art, I aim to highlight the interconnectedness of humanity and the constant dance of equilibrium.
-        </p>
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <button class="lb-close" id="lbClose">&#10005; Close</button>
+  <button class="lb-arrow lb-prev" id="lbPrev">&#8592;</button>
+  <div class="lb-img-wrap"><img id="lbImg" src="" alt="" /></div>
+  <button class="lb-arrow lb-next" id="lbNext">&#8594;</button>
+  <div class="lb-meta">
+    <div class="lb-title" id="lbTitle"></div>
+    <div class="lb-counter" id="lbCounter"></div>
+  </div>
+</div>
 
-        <p>
-            Join me on this artistic journey as we explore the delicate symphony of relationships, cultural nuances, and the profound reasons behind our actions.
-        </p>
-    </section>
+<script>
+// ─────────────────────────────────────────────────────────────
+//  PIECES DATA — the only place you need to edit to add photos
+//
+//  For each piece, add image paths inside the images array.
+//  You can add as many images as you like per piece.
+//  Example:
+//    images: [
+//      "images/listen-1.jpg",
+//      "images/listen-2.jpg",
+//      "images/listen-3.jpg"
+//    ]
+// ─────────────────────────────────────────────────────────────
+const pieces = [
+  { id: 0, label: "Listen",                images: ["1.JPG",
+      "2.jpg",
+      "presslisten2.jpg",
+      "listen.101.jpg"] },
+  { id: 1, label: "Together",              images: ["GDejesus_4.1.jpg","Togther1.3.jpg",
+      "LINE1.jpg"] },
+  { id: 2, label: "It's Complicated",      images: [ "GDejesus_1.jpg",
+      "wood1.1.jpg",
+      "WOOD2.1.jpg",
+      "WOOD3.1.jpg"] },
+  { id: 3, label: "Making the Connection", images: ["GDejesus_3.jpg","GDejesus_5.jpg",
+      "MTC0.jpg","IMG_0713 copy.jpg","MTC1.jpg"] },
+  { id: 4, label: "By the Neck",           images: ["GDejesus_7.jpg","IMG_0357.jpg",
+      "IMG_0365.jpg",
+      "Hug1.jpg",
+      "HUg.jpg"] }
+];
 
-    <section id="cv">
-        <h2>Curriculum Vitae (CV)</h2>
-        <h2>Gleimi De Jesus</h2>
-        <p>5800 Bay Shore Road - Sarasota, FL 34243<br>
-        Gleimi.DeJesus24@ncf.edu</p>
-    
-        <h3>Education</h3>
-        <ul>
-            <li>New College of Florida, Bachelor of Arts in Humanities, 2024</li>
-            <ul>
-                <li>Art Major and Statistics Minor</li>
-            </ul>
-        </ul>
-    
-        <h3>Exhibitions</h3>
-        <ul>
-            <li>Issermann Gallery, <i>un/seen bodies</i>, 2023</li>
-            <li>Issermann Gallery, <i>New Visions</i>, 2023</li>
-            <li>Art Center of Sarasota, <i>Focus: New College Art</i>, 2022</li>
-            <li>Tampa Museum of Art, <i>Congressional</i>, 2020</li>
-            <li>Tampa Museum Of Art Youth Council, <i>Past, Present and Future</i>, 2019</li>
-            <li>University of Tampa Gallery, <i>Scholastics Art and Writing Awards, Gold Key</i>, 2019</li>
-            <li>Gallery 221, HCC Dale Mabry Campus, 2018</li>
-        </ul>
-    
-        <h3>Publications</h3>
-        <ul>
-            <li><i>un/seen bodies catalog</i>, 2023</li>
-        </ul>
-    
-        <h3>Awards/Honors</h3>
-        <ul>
-            <li>Tampa Museum of Art, <i>Congressional, Best Sculpture Award</i>, 2020</li>
-            <li>Designed the <i>Congressional Medal of Honor Challenge coin for Integrity</i>, 2020</li>
-            <li>The University Of Tampa Gallery, <i>Scholastics Art and Writing Awards, Gold Key</i>, 2019</li>
-            <li>Tampa Bay Fair Housing Consortium, <i>Annual Fair Housing Symposium’s Poster Contest, First Place</i>, 2019</li>
-            <li>EPC, <i>Environmental Photography Contest, Second Place</i>, 2019</li>
-            <li>Gallery 221@HCC Dale Mabry Campus, <i>Calyx Schencker Art Infinitum, 3rd Place Photography, CSAI 2018</i></li>
-        </ul>
-    
-        <h3>Professional Experience</h3>
-        <ul>
-            <li><i>August 2021-Present</i></li>
-            <ul>
-                <li><strong>New College of Florida Teaching Assistant</strong> - Sarasota, FL</li>
-                <li>Sculpture Lab Technician</li>
-            </ul>
-            <li><i>March 2022-August 2022</i></li>
-            <ul>
-                <li><strong>Multicultural Health Institute</strong> - Sarasota, FL</li>
-                <li>Communications and Graphics/Data Visualization</li>
-            </ul>
-        </ul>
-        <a href="cv.pdf" download="Gleimi_De_Jesus_CV.pdf">Download CV</a>
-        <!-- Add your CV content here -->
-    </section>
+// Placeholder aspect ratios shown until real photos are added
+const placeholderRatios = [1.4, 0.75, 1.2, 0.8, 1.5, 0.9, 1.1, 0.7];
 
-    <footer>
-        <p>&copy; 2023 Gleimi De Jesus - Art Portfolio</p>
-    </footer>
-    <script>
-       const gallery = document.querySelector('.gallery');
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightbox-img');
-const lightboxCaptionContainer = document.getElementById('lightbox-caption-container');
+// ── BUILD MASONRY ──
+const masonry = document.getElementById('masonry');
 
-gallery.addEventListener('click', function (event) {
-    if (event.target.tagName === 'IMG') {
-        // Display the clicked image and caption in the lightbox
-        lightbox.style.display = 'flex';
-        lightboxImg.src = event.target.src;
-
-        // Clear previous captions
-        lightboxCaptionContainer.innerHTML = '';
-
-        // Get all associated captions and append them
-        const figcaptions = event.target.parentNode.querySelectorAll('figcaption');
-        figcaptions.forEach(figcaption => {
-            const captionParagraph = document.createElement('p');
-            captionParagraph.textContent = figcaption.textContent;
-            lightboxCaptionContainer.appendChild(captionParagraph);
-        });
+function buildMasonry() {
+  masonry.innerHTML = '';
+  let phIndex = 0;
+  pieces.forEach(piece => {
+    if (piece.images.length > 0) {
+      piece.images.forEach((src, i) => {
+        const item = document.createElement('div');
+        item.className = 'm-item';
+        item.dataset.pieceId = piece.id;
+        item.dataset.imgIndex = i;
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = piece.label + ' ' + (i + 1);
+        const label = document.createElement('span');
+        label.className = 'm-label';
+        label.textContent = piece.label;
+        item.appendChild(img);
+        item.appendChild(label);
+        masonry.appendChild(item);
+      });
+    } else {
+      const item = document.createElement('div');
+      item.className = 'm-item';
+      item.dataset.pieceId = piece.id;
+      item.dataset.imgIndex = 0;
+      const ratio = placeholderRatios[phIndex % placeholderRatios.length];
+      const ph = document.createElement('span');
+      ph.className = 'm-placeholder';
+      ph.style.paddingBottom = (ratio * 100) + '%';
+      const label = document.createElement('span');
+      label.className = 'm-label';
+      label.textContent = piece.label;
+      item.appendChild(ph);
+      item.appendChild(label);
+      masonry.appendChild(item);
+      phIndex++;
     }
+  });
+}
+buildMasonry();
+
+// ── SELECTION / DIM ──
+let activePieceId = null;
+const pieceListItems = document.querySelectorAll('#pieceList li');
+
+function setActive(pieceId) {
+  if (activePieceId === pieceId) {
+    activePieceId = null;
+    masonry.classList.remove('has-active');
+    masonry.querySelectorAll('.m-item').forEach(el => el.classList.remove('active'));
+    pieceListItems.forEach(li => li.classList.remove('active'));
+  } else {
+    activePieceId = pieceId;
+    masonry.classList.add('has-active');
+    masonry.querySelectorAll('.m-item').forEach(el => {
+      el.classList.toggle('active', parseInt(el.dataset.pieceId) === pieceId);
+    });
+    pieceListItems.forEach(li => {
+      li.classList.toggle('active', parseInt(li.dataset.piece) === pieceId);
+    });
+  }
+}
+
+pieceListItems.forEach(li => {
+  li.addEventListener('click', () => setActive(parseInt(li.dataset.piece)));
 });
 
-function closeLightbox() {
-    lightbox.style.display = 'none';
+// ── LIGHTBOX ──
+const lightbox = document.getElementById('lightbox');
+const lbImg    = document.getElementById('lbImg');
+const lbTitle  = document.getElementById('lbTitle');
+const lbCounter = document.getElementById('lbCounter');
+const lbPrev   = document.getElementById('lbPrev');
+const lbNext   = document.getElementById('lbNext');
+const lbClose  = document.getElementById('lbClose');
+let lbPiece = null;
+let lbIndex = 0;
+
+function openLightbox(pieceId, imgIndex) {
+  lbPiece = pieces.find(p => p.id === pieceId);
+  if (!lbPiece || lbPiece.images.length === 0) return;
+  lbIndex = imgIndex;
+  renderLightbox();
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-    </script>
 
+function renderLightbox() {
+  lbImg.src = lbPiece.images[lbIndex];
+  lbImg.alt = lbPiece.label + ' ' + (lbIndex + 1);
+  lbTitle.textContent = lbPiece.label;
+  lbCounter.textContent = (lbIndex + 1) + ' / ' + lbPiece.images.length;
+  lbPrev.disabled = lbIndex === 0;
+  lbNext.disabled = lbIndex === lbPiece.images.length - 1;
+}
 
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  document.body.style.overflow = '';
+  lbImg.src = '';
+}
 
+lbClose.addEventListener('click', closeLightbox);
+lbPrev.addEventListener('click', () => { if (lbIndex > 0) { lbIndex--; renderLightbox(); } });
+lbNext.addEventListener('click', () => { if (lbIndex < lbPiece.images.length - 1) { lbIndex++; renderLightbox(); } });
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', e => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft' && lbIndex > 0) { lbIndex--; renderLightbox(); }
+  if (e.key === 'ArrowRight' && lbIndex < lbPiece.images.length - 1) { lbIndex++; renderLightbox(); }
+});
 
+// First click = select/dim; second click on same piece = open lightbox
+masonry.addEventListener('click', e => {
+  const item = e.target.closest('.m-item');
+  if (!item) return;
+  const pieceId  = parseInt(item.dataset.pieceId);
+  const imgIndex = parseInt(item.dataset.imgIndex) || 0;
+  if (activePieceId === pieceId) {
+    openLightbox(pieceId, imgIndex);
+  } else {
+    setActive(pieceId);
+  }
+});
 
+// Click outside to deselect
+document.addEventListener('click', e => {
+  if (!masonry.contains(e.target) && !e.target.closest('#pieceList')) {
+    activePieceId = null;
+    masonry.classList.remove('has-active');
+    masonry.querySelectorAll('.m-item').forEach(el => el.classList.remove('active'));
+    pieceListItems.forEach(li => li.classList.remove('active'));
+  }
+});
+
+// ── TICKER ──
+function buildTicker(el) {
+  let html = '';
+  for (let i = 0; i < 16; i++) html += '<span>GLEIMI DE JESUS</span><span class="dot">&nbsp;&middot;&nbsp;</span>';
+  el.innerHTML = html + html;
+}
+buildTicker(document.getElementById('tickerTop'));
+buildTicker(document.getElementById('tickerBottom'));
+
+// ── NAV ──
+const navToggle = document.getElementById('navToggle');
+const navLinks  = document.getElementById('navLinks');
+navToggle.addEventListener('click', () => {
+  const open = navLinks.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open);
+});
+navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  navLinks.classList.remove('open');
+  navToggle.setAttribute('aria-expanded', false);
+}));
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 10);
+});
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 </body>
-
 </html>
